@@ -111,6 +111,37 @@ The data of a previously-exported file or hand-generated file are piped in::
 
 The ``validate`` command also supports input in the `rosinstall file format <http://www.ros.org/doc/independent/api/rosinstall/html/rosinstall_file_format.html>`_.
 
+Apply patches (experimental; only git)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Example vcs.list:
+
+.. code-block:: yaml
+
+    repositories:
+      vcstool:
+        type: git
+        url: https://github.com/dirk-thomas/vcstool
+        version: master
+      vcstool-patched:
+        type: git
+        url: https://github.com/dirk-thomas/vcstool
+        version: master
+        patch: 0001-A-Patch.patch
+      vcstool-multi-patched:
+        type: git
+        url: https://github.com/dirk-thomas/vcstool
+        version: master
+        patch:
+          - 0001-A-Patch.patch
+          - 0002-More-Patch.patch
+
+Example execution:
+
+.. code-block:: bash
+
+    vcs import < vcs.list
+    vcs patch < vcs.list
 
 Advanced features
 -----------------

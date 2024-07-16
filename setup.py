@@ -53,6 +53,7 @@ Currently it supports git, hg, svn and bzr.',
             'vcs-status = vcstool.commands.status:main',
             'vcs-svn = vcstool.commands.custom:svn_main',
             'vcs-validate = vcstool.commands.validate:main',
+            'vcs-patch = vcstool.commands.patch:main',
         ]
     }
 )

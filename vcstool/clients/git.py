@@ -222,6 +222,68 @@ class GitClient(VcsClientBase):
                 result_url['output']
         return result_url
 
+    def patch(self, command):
+        self._check_executable()
+
+        if not GitClient.is_repository(self.path):
+            return {
+                'cmd': '',
+                'cwd': self.path,
+                'output': 'First pull the repository (e.g. with "vcs import")',
+                'returncode': 1
+            }
+
+        # Get current repos context
+        urls = self._get_remote_urls()
+        # Something got wrong
+        if urls['returncode']:
+            return urls
+        # Find a matching url
+        for url, remote in urls['output']:
+            if url == command.url:
+                break
+        else:
+            return {
+                'cmd': '',
+                'cwd': self.path,
+                'output': 'Path contains a different repository',
+                'returncode': 1
+            }
+
+        if len(command.patch) == 0:
+            return {
+                'cmd': '',
+                'cwd': self.path,
+                'output': 'Nothing to patch',
+                'returncode': 0
+            }
+
+        # Check if last patch is already applied
+        # meaning we are already finished here
+        last_patch = command.patch[-1]
+        cmd = [
+            GitClient._executable,
+            'apply',
+            '--reverse',
+            '--check',
+            last_patch
+            ]
+        result_check = self._run_command(cmd)
+        if result_check['returncode'] == 0:
+            return {
+                'cmd': '',
+                'cwd': self.path,
+                'output': 'Patches already applied',
+                'returncode': 0
+            }
+        for patch in command.patch:
+            cmd = [GitClient._executable, 'am', patch]
+            result = self._run_command(cmd)
+            if result['returncode'] != 0:
+                return result
+
+        return result
+
     def import_(self, command):
         if not command.url:
             return {
